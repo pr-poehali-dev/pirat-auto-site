@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useState, useEffect } from "react";
 import PreOrderForm from "@/components/PreOrderForm";
@@ -49,96 +50,107 @@ const FeaturedCars = () => {
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-slate-800 mb-4">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
             Рекомендуемые автомобили
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Лучшие предложения нашего автосалона с проверенной историей и
-            гарантией качества
+            Отобранные специалистами автомобили из нашего каталога отечественных
+            и зарубежных марок
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {featuredCars.map((car) => (
             <div
               key={car.id}
-              className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden"
+              className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
             >
-              <img
-                src={car.image}
-                alt={`${car.make} ${car.model}`}
-                className="w-full h-48 object-cover"
-              />
+              <div className="relative">
+                <img
+                  src={car.image}
+                  alt={`${car.make} ${car.model}`}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute top-3 left-3">
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded ${
+                      car.country === "domestic"
+                        ? "bg-blue-100 text-blue-800"
+                        : "bg-purple-100 text-purple-800"
+                    }`}
+                  >
+                    {car.country === "domestic"
+                      ? "🇷🇺 Отечественное"
+                      : "🌍 Иномарка"}
+                  </span>
+                </div>
+              </div>
 
               <div className="p-6">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xl font-semibold text-slate-800">
+                  <h3 className="text-lg font-semibold text-gray-900">
                     {car.make} {car.model}
                   </h3>
                   <span className="text-sm text-gray-500">{car.year}</span>
                 </div>
 
-                <div className="text-2xl font-bold text-blue-600 mb-4">
-                  {formatPrice(car.price)}
-                </div>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {car.description}
+                </p>
 
-                <div className="space-y-2 text-sm text-gray-600 mb-4">
-                  <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center gap-1">
                     <Icon name="Gauge" size={16} />
-                    <span>{car.mileage.toLocaleString()} км</span>
+                    {car.mileage.toLocaleString()} км
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <Icon name="Fuel" size={16} />
-                    <span>{car.fuel}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="Settings" size={16} />
-                    <span>{car.transmission}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="Car" size={16} />
-                    <span>
-                      {car.body_type} • {car.color}
-                    </span>
+                    {car.fuel}
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => addToCart(car)}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
-                  >
-                    В корзину
-                  </button>
-                  <button
-                    onClick={() => setShowPreOrder(car.id)}
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
-                  >
-                    Предзаказ
-                  </button>
+                <div className="flex items-center justify-between">
+                  <div className="text-2xl font-bold text-blue-600">
+                    {formatPrice(car.price)}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={() => setShowPreOrder(car.id)}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Предзаказ
+                    </Button>
+                    <Button
+                      onClick={() => addToCart(car)}
+                      size="sm"
+                      className="flex items-center gap-1"
+                    >
+                      <Icon name="ShoppingCart" size={16} />В корзину
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div className="text-center">
-          <Link
-            to="/catalog"
-            className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-8 py-3 rounded-lg font-medium transition-colors"
-          >
-            Смотреть все автомобили
-            <Icon name="ArrowRight" size={20} />
+        <div className="text-center mt-12">
+          <Link to="/catalog">
+            <Button size="lg" className="px-8">
+              Посмотреть весь каталог
+              <Icon name="ArrowRight" size={20} className="ml-2" />
+            </Button>
           </Link>
         </div>
-
-        {showPreOrder && (
-          <PreOrderForm
-            car={featuredCars.find((car) => car.id === showPreOrder)!}
-            onClose={() => setShowPreOrder(null)}
-          />
-        )}
       </div>
+
+      {showPreOrder && (
+        <PreOrderForm
+          carId={showPreOrder}
+          onClose={() => setShowPreOrder(null)}
+        />
+      )}
     </section>
   );
 };
