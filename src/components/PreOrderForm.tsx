@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Icon from "@/components/ui/icon";
 import { CarItem } from "@/contexts/CartContext";
+import { CarService } from "@/services/carService";
 
 interface PreOrderFormProps {
   car: Omit<CarItem, "quantity">;
@@ -19,12 +20,26 @@ const PreOrderForm = ({ car, onClose }: PreOrderFormProps) => {
     return new Intl.NumberFormat("ru-RU").format(price) + " ₽";
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    alert(
-      "Заявка на предзаказ отправлена! Мы свяжемся с вами в ближайшее время.",
-    );
-    onClose();
+
+    try {
+      await CarService.createPreOrder({
+        car_id: car.id,
+        customer_name: formData.name,
+        customer_phone: formData.phone,
+        customer_email: formData.email || undefined,
+        comment: formData.comment || undefined,
+      });
+
+      alert(
+        "Заявка на предзаказ отправлена! Мы свяжемся с вами в ближайшее время.",
+      );
+      onClose();
+    } catch (error) {
+      alert("Произошла ошибка при отправке заявки. Попробуйте еще раз.");
+      console.error("Ошибка создания предзаказа:", error);
+    }
   };
 
   return (
