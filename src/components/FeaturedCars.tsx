@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
+import { useCart } from "@/contexts/CartContext";
+import { useState } from "react";
+import PreOrderForm from "@/components/PreOrderForm";
 
 const FeaturedCars = () => {
   const featuredCars = [
@@ -40,6 +43,9 @@ const FeaturedCars = () => {
       transmission: "Механика",
     },
   ];
+
+  const { addToCart } = useCart();
+  const [showPreOrder, setShowPreOrder] = useState<number | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ru-RU").format(price) + " ₽";
@@ -97,9 +103,20 @@ const FeaturedCars = () => {
                   </div>
                 </div>
 
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors">
-                  Подробнее
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => addToCart(car)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                  >
+                    В корзину
+                  </button>
+                  <button
+                    onClick={() => setShowPreOrder(car.id)}
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                  >
+                    Предзаказ
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -114,6 +131,13 @@ const FeaturedCars = () => {
             <Icon name="ArrowRight" size={20} />
           </Link>
         </div>
+
+        {showPreOrder && (
+          <PreOrderForm
+            car={featuredCars.find((car) => car.id === showPreOrder)!}
+            onClose={() => setShowPreOrder(null)}
+          />
+        )}
       </div>
     </section>
   );

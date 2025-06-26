@@ -1,5 +1,8 @@
 import { Link, useLocation } from "react-router-dom";
 import Icon from "@/components/ui/icon";
+import { useCart } from "@/contexts/CartContext";
+import { useState } from "react";
+import Cart from "@/components/Cart";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -7,6 +10,8 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
+  const { getTotalItems } = useCart();
+  const [showCart, setShowCart] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -64,9 +69,23 @@ const Layout = ({ children }: LayoutProps) => {
               </Link>
             </nav>
 
-            <button className="md:hidden">
-              <Icon name="Menu" size={24} />
-            </button>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setShowCart(true)}
+                className="relative p-2 text-gray-700 hover:text-blue-600 transition-colors"
+              >
+                <Icon name="ShoppingCart" size={24} />
+                {getTotalItems() > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {getTotalItems()}
+                  </span>
+                )}
+              </button>
+
+              <button className="md:hidden">
+                <Icon name="Menu" size={24} />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -109,6 +128,8 @@ const Layout = ({ children }: LayoutProps) => {
           </div>
         </div>
       </footer>
+
+      <Cart isOpen={showCart} onClose={() => setShowCart(false)} />
     </div>
   );
 };
