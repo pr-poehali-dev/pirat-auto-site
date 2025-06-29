@@ -2,6 +2,7 @@ import { useState } from "react";
 import Icon from "@/components/ui/icon";
 import { CarItem } from "@/contexts/CartContext";
 import { CarService } from "@/services/carService";
+import { Car } from "@/lib/supabase";
 
 interface PreOrderFormProps {
   car: Omit<CarItem, "quantity">;

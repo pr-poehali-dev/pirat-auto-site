@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { useState, useEffect } from "react";
 import PreOrderForm from "@/components/PreOrderForm";
-import { CarService, Car } from "@/services/carService";
+import { CarService } from "@/services/carService";
+import { Car } from "@/lib/supabase";
 
 const FeaturedCars = () => {
   const [featuredCars, setFeaturedCars] = useState<Car[]>([]);
