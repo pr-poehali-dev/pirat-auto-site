@@ -1,4 +1,5 @@
 import { supabase, Car, PreOrder } from "@/lib/supabase";
+import { telegramService } from "@/lib/telegram";
 
 export class CarService {
   // Получить все автомобили с фильтрацией
@@ -76,21 +77,31 @@ export class CarService {
     }
   }
 
-  // Создать предзаказ
+  // Создать предзаказ с уведомлением в Telegram
   static async createPreOrder(
     orderData: Omit<PreOrder, "id" | "created_at" | "status">,
-  ) {
+  ): Promise<PreOrder | null> {
     try {
       const { data, error } = await supabase
         .from("pre_orders")
         .insert([{ ...orderData, status: "pending" }])
-        .select();
+        .select()
+        .single();
 
       if (error) throw error;
-      return data?.[0];
+
+      // Отправляем уведомление в Telegram
+      if (data) {
+        const car = await this.getCarById(data.car_id);
+        if (car) {
+          await telegramService.notifyNewOrder(data, car);
+        }
+      }
+
+      return data;
     } catch (error) {
       console.error("Ошибка создания предзаказа:", error);
-      throw error;
+      return null;
     }
   }
 
